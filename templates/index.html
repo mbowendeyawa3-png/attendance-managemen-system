@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Attendance Management System</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+
+  <body>
+    <!-- ================= LOGIN PAGE ================= -->
+
+    <div id="loginPage" class="login-container">
+      <div class="login-box">
+        <div class="logo">📚</div>
+
+        <h1>Smart Attendance</h1>
+        <p class="subtitle">Student Attendance Management System</p>
+
+        <form id="loginForm">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            placeholder="Enter username"
+            required
+          />
+
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter password"
+            required
+          />
+
+          <label for="userType">Login As</label>
+
+          <select id="userType">
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+          </select>
+
+          <button type="submit" class="login-button">Login</button>
+        </form>
+
+        <p class="demo-login">
+          Demo: username = <b>admin</b>, password = <b>1234</b>
+        </p>
+
+        <p id="loginMessage"></p>
+      </div>
+    </div>
+
+    <!-- ================= TEACHER DASHBOARD ================= -->
+
+    <div id="teacherDashboard" class="dashboard hidden">
+      <!-- Sidebar -->
+
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          📚
+          <span>Smart Attendance</span>
+        </div>
+
+        <nav>
+          <button
+            class="nav-button active"
+            onclick="showSection('dashboardSection')"
+          >
+            🏠 Dashboard
+          </button>
+
+          <button
+            class="nav-button"
+            onclick="showSection('markAttendanceSection')"
+          >
+            📝 Mark Attendance
+          </button>
+
+          <button class="nav-button" onclick="showSection('studentsSection')">
+            👨‍🎓 Students
+          </button>
+
+          <button class="nav-button" onclick="showSection('recordsSection')">
+            📊 Attendance Records
+          </button>
+        </nav>
+
+        <button class="logout-button" onclick="logout()">🚪 Logout</button>
+      </aside>
+
+      <!-- Main Content -->
+
+      <main class="main-content">
+        <!-- Header -->
+
+        <header class="top-header">
+          <div>
+            <h2 id="pageTitle">Dashboard</h2>
+            <p>Welcome back, Teacher</p>
+          </div>
+
+          <div class="teacher-profile">
+            👨‍🏫
+            <span>Teacher</span>
+          </div>
+        </header>
+
+        <!-- ================= DASHBOARD SECTION ================= -->
+
+        <section id="dashboardSection" class="content-section">
+          <div class="welcome-card">
+            <div>
+              <h2>Welcome to Smart Attendance</h2>
+              <p>
+                Manage student attendance easily and keep track of attendance
+                records.
+              </p>
+            </div>
+
+            <div class="welcome-icon">📋</div>
+          </div>
+
+          <!-- Statistics -->
+
+          <div class="stats-container">
+            <div class="stat-card">
+              <div class="stat-icon">👨‍🎓</div>
+
+              <div>
+                <h3 id="totalStudents">5</h3>
+                <p>Total Students</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">✅</div>
+
+              <div>
+                <h3 id="presentToday">0</h3>
+                <p>Present Today</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">❌</div>
+
+              <div>
+                <h3 id="absentToday">0</h3>
+                <p>Absent Today</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">📈</div>
+
+              <div>
+                <h3 id="averageAttendance">80%</h3>
+                <p>Average Attendance</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+
+          <div class="section-card">
+            <h2>Quick Actions</h2>
+
+            <div class="quick-actions">
+              <button onclick="showSection('markAttendanceSection')">
+                📝 Mark Attendance
+              </button>
+
+              <button onclick="showSection('studentsSection')">
+                👨‍🎓 View Students
+              </button>
+
+              <button onclick="showSection('recordsSection')">
+                📊 View Records
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= MARK ATTENDANCE ================= -->
+
+        <section id="markAttendanceSection" class="content-section hidden">
+          <div class="section-card">
+            <div class="section-heading">
+              <div>
+                <h2>Mark Attendance</h2>
+                <p>Select a subject and mark today's attendance.</p>
+              </div>
+
+              <div class="date-box">📅 <span id="currentDate"></span></div>
+            </div>
+
+            <div class="form-row">
+              <div>
+                <label for="subject">Subject</label>
+
+                <select id="subject">
+                  <option value="Database Management System">
+                    Database Management System
+                  </option>
+
+                  <option value="Computer Networks">Computer Networks</option>
+
+                  <option value="Java">Java</option>
+
+                  <option value="Python">Python</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="attendance-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Roll No.</th>
+                    <th>Student Name</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody id="attendanceTable"></tbody>
+              </table>
+            </div>
+
+            <button class="save-button" onclick="saveAttendance()">
+              💾 Save Attendance
+            </button>
+
+            <p id="attendanceMessage"></p>
+          </div>
+        </section>
+
+        <!-- ================= STUDENTS ================= -->
+
+        <section id="studentsSection" class="content-section hidden">
+          <div class="section-card">
+            <div class="section-heading">
+              <div>
+                <h2>Students</h2>
+                <p>View and manage registered students.</p>
+              </div>
+
+              <button class="add-button" onclick="openStudentForm()">
+                + Add Student
+              </button>
+            </div>
+
+            <!-- Add Student Form -->
+
+            <div id="studentForm" class="student-form hidden">
+              <h3>Add New Student</h3>
+
+              <div class="form-grid">
+                <div>
+                  <label>Roll Number</label>
+
+                  <input type="text" id="newRoll" placeholder="Example: 106" />
+                </div>
+
+                <div>
+                  <label>Student Name</label>
+
+                  <input
+                    type="text"
+                    id="newName"
+                    placeholder="Enter student name"
+                  />
+                </div>
+              </div>
+
+              <button class="save-button" onclick="addStudent()">
+                Add Student
+              </button>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Roll No.</th>
+                    <th>Name</th>
+                    <th>Attendance</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody id="studentsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= RECORDS ================= -->
+
+        <section id="recordsSection" class="content-section hidden">
+          <div class="section-card">
+            <div class="section-heading">
+              <div>
+                <h2>Attendance Records</h2>
+                <p>View student attendance information.</p>
+              </div>
+
+              <select id="recordSubject" onchange="displayRecords()">
+                <option value="all">All Subjects</option>
+                <option value="Database Management System">
+                  Database Management System
+                </option>
+                <option value="Computer Networks">Computer Networks</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+              </select>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Roll No.</th>
+                    <th>Student Name</th>
+                    <th>Classes Held</th>
+                    <th>Classes Attended</th>
+                    <th>Percentage</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody id="recordsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ================= STUDENT DASHBOARD ================= -->
+
+    <div id="studentDashboard" class="dashboard hidden">
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          📚
+          <span>Smart Attendance</span>
+        </div>
+
+        <nav>
+          <button
+            class="nav-button active"
+            onclick="showStudentSection('studentHome')"
+          >
+            🏠 Dashboard
+          </button>
+
+          <button
+            class="nav-button"
+            onclick="showStudentSection('studentAttendance')"
+          >
+            📊 My Attendance
+          </button>
+        </nav>
+
+        <button class="logout-button" onclick="logout()">🚪 Logout</button>
+      </aside>
+
+      <main class="main-content">
+        <header class="top-header">
+          <div>
+            <h2>Student Dashboard</h2>
+            <p>Welcome, Student</p>
+          </div>
+
+          <div class="teacher-profile">
+            👨‍🎓
+            <span>Student</span>
+          </div>
+        </header>
+
+        <!-- Student Home -->
+
+        <section id="studentHome" class="content-section">
+          <div class="welcome-card">
+            <div>
+              <h2>Welcome, Student!</h2>
+
+              <p>
+                Check your attendance and keep track of your academic progress.
+              </p>
+            </div>
+
+            <div class="welcome-icon">🎓</div>
+          </div>
+
+          <div class="stats-container">
+            <div class="stat-card">
+              <div class="stat-icon">📚</div>
+
+              <div>
+                <h3>4</h3>
+                <p>Subjects</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">📈</div>
+
+              <div>
+                <h3>82%</h3>
+                <p>Overall Attendance</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <h2>My Attendance Summary</h2>
+
+            <div class="progress-item">
+              <div class="progress-info">
+                <span>Database Management System</span>
+                <span>90%</span>
+              </div>
+
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 90%"></div>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <div class="progress-info">
+                <span>Computer Networks</span>
+                <span>78%</span>
+              </div>
+
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 78%"></div>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <div class="progress-info">
+                <span>Java</span>
+                <span>85%</span>
+              </div>
+
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 85%"></div>
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <div class="progress-info">
+                <span>Python</span>
+                <span>75%</span>
+              </div>
+
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 75%"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Student Attendance -->
+
+        <section id="studentAttendance" class="content-section hidden">
+          <div class="section-card">
+            <h2>My Attendance</h2>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Classes Held</th>
+                    <th>Attended</th>
+                    <th>Percentage</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td>Database Management System</td>
+                    <td>20</td>
+                    <td>18</td>
+                    <td>90%</td>
+                    <td>
+                      <span class="status good"> Good </span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>Computer Networks</td>
+                    <td>20</td>
+                    <td>16</td>
+                    <td>80%</td>
+                    <td>
+                      <span class="status good"> Good </span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>Java</td>
+                    <td>20</td>
+                    <td>17</td>
+                    <td>85%</td>
+                    <td>
+                      <span class="status good"> Good </span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>Python</td>
+                    <td>20</td>
+                    <td>15</td>
+                    <td>75%</td>
+                    <td>
+                      <span class="status warning"> Low </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
